@@ -5,6 +5,9 @@ import './index.css';
 import ParticipantsPage from './pages/ParticipantsPage';
 import NewParticipantPage from './pages/NewParticipantPage';
 import ParticipantDetailPage from './pages/ParticipantDetailPage';
+import ClassesPage from './pages/ClassesPage';
+import NewClassPage from './pages/NewClassPage';
+import ClassDetailPage from './pages/ClassDetailPage';
 function App() {
   return (
     <BrowserRouter>
@@ -19,11 +22,21 @@ function App() {
         </header>
         <main className="max-w-5xl mx-auto p-6">
           <Routes>
-            <Route path="/" element={<div>Dashboard</div>} />
-            <Route path="/participants" element={<ParticipantsPage />} />
-            <Route path="/participants/new" element={<NewParticipantPage />} />
-            <Route path="/participants/:id" element={<ParticipantDetailPage />} /> {/* ⬅️ ini */}
-          </Routes>
+  <Route path="/" element={<div>Dashboard</div>} />
+
+  {/* Participants */}
+  <Route path="/participants" element={<ParticipantsPage />} />
+  <Route path="/participants/new" element={<NewParticipantPage />} />
+  <Route path="/participants/:id" element={<ParticipantDetailPage />} />
+
+  {/* Classes */}
+  <Route path="/classes" element={<ClassesPage />} />
+  <Route path="/classes/new" element={<NewClassPage />} />
+  <Route path="/classes/:id" element={<ClassDetailPage />} />
+
+  {/* Enrollments nanti nyusul */}
+</Routes>
+
         </main>
       </div>
     </BrowserRouter>
