@@ -8,6 +8,7 @@ import ParticipantDetailPage from './pages/ParticipantDetailPage';
 import ClassesPage from './pages/ClassesPage';
 import NewClassPage from './pages/NewClassPage';
 import ClassDetailPage from './pages/ClassDetailPage';
+import NewEnrollmentPage from './pages/NewEnrollmentPage';
 function App() {
   return (
     <BrowserRouter>
@@ -17,7 +18,7 @@ function App() {
           <nav className="flex gap-4 text-sm">
             <Link to="/participants">Participants</Link>
             <Link to="/classes">Classes</Link>
-            <Link to="/enrollments">Enrollments</Link>
+            <Link to="/enrollments/new">Enrollments</Link>
           </nav>
         </header>
         <main className="max-w-5xl mx-auto p-6">
@@ -34,7 +35,9 @@ function App() {
   <Route path="/classes/new" element={<NewClassPage />} />
   <Route path="/classes/:id" element={<ClassDetailPage />} />
 
-  {/* Enrollments nanti nyusul */}
+  {/* Enrollments */}
+  <Route path="/enrollments/new" element={<NewEnrollmentPage />} />
+
 </Routes>
 
         </main>

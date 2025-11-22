@@ -10,11 +10,29 @@ type Participant = {
   phone: string;
 };
 
+type EnrollmentClass = {
+  id: number;
+  name: string;
+  description: string;
+  instructor: string;
+  status: string;
+};
+
+type Enrollment = {
+  id: number;
+  classEntity: EnrollmentClass | null;
+};
+
+type ParticipantDetail = Participant & {
+  enrollments?: Enrollment[];
+};
+
 const ParticipantDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const [form, setForm] = useState<Participant | null>(null);
+  const [enrollments, setEnrollments] = useState<Enrollment[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,8 +42,19 @@ const ParticipantDetailPage: React.FC = () => {
     setError(null);
     setLoading(true);
     try {
-      const data: Participant = await api.get(`/participants/${id}`);
-      setForm(data);
+      const data: ParticipantDetail = await api.get(`/participants/${id}`);
+
+      // isi form basic participant
+      setForm({
+        id: data.id,
+        nim: data.nim,
+        full_name: data.full_name,
+        email: data.email,
+        phone: data.phone,
+      });
+
+      // isi enrollments (kalau ada)
+      setEnrollments(data.enrollments || []);
     } catch (err: any) {
       setError(err.message || 'Gagal memuat data peserta');
     } finally {
@@ -35,6 +64,7 @@ const ParticipantDetailPage: React.FC = () => {
 
   useEffect(() => {
     load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   async function handleSave(e: React.FormEvent) {
@@ -73,7 +103,7 @@ const ParticipantDetailPage: React.FC = () => {
   }
 
   if (loading || !form) {
-    return <div className="text-sm">Loading...</div>;
+    return <div className="text-sm text-slate-300">Loading...</div>;
   }
 
   return (
@@ -94,6 +124,7 @@ const ParticipantDetailPage: React.FC = () => {
         </div>
       )}
 
+      {/* FORM UPDATE PARTICIPANT */}
       <form
         onSubmit={handleSave}
         className="space-y-3 bg-slate-800 p-4 rounded border border-slate-700"
@@ -154,6 +185,66 @@ const ParticipantDetailPage: React.FC = () => {
           </button>
         </div>
       </form>
+
+      {/* TABEL KELAS YANG DIIKUTI PESERTA */}
+      <div className="bg-slate-900 p-4 rounded border border-slate-700 space-y-2">
+        <h3 className="text-sm font-semibold">Classes Enrolled</h3>
+        {enrollments.length === 0 ? (
+          <p className="text-xs text-slate-400">
+            Peserta ini belum terdaftar di kelas mana pun.
+          </p>
+        ) : (
+          <table className="w-full text-xs border border-slate-700 rounded">
+            <thead className="bg-slate-800">
+              <tr>
+                <th className="px-2 py-1 text-left">Enrollment ID</th>
+                <th className="px-2 py-1 text-left">Class Name</th>
+                <th className="px-2 py-1 text-left">Instructor</th>
+                <th className="px-2 py-1 text-left">Status</th>
+                <th className="px-2 py-1 text-left">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {enrollments.map((en) => (
+                <tr key={en.id} className="border-t border-slate-700">
+                  <td className="px-2 py-1">{en.id}</td>
+                  <td className="px-2 py-1">
+                    {en.classEntity?.name ?? 'Unnamed class'}
+                  </td>
+                  <td className="px-2 py-1">
+                    {en.classEntity?.instructor ?? '-'}
+                  </td>
+                  <td className="px-2 py-1">
+                    {en.classEntity?.status ?? '-'}
+                  </td>
+                  <td className="px-2 py-1">
+                    <button
+                      type="button"
+                      className="text-[11px] text-red-300 underline"
+                      onClick={async () => {
+                        const ok = window.confirm(
+                          'Yakin ingin membatalkan pendaftaran peserta dari kelas ini?',
+                        );
+                        if (!ok) return;
+                        try {
+                          await api.delete(`/enrollments/${en.id}`);
+                          await load(); // refresh data setelah delete
+                        } catch (err: any) {
+                          alert(
+                            err.message || 'Gagal menghapus enrollment',
+                          );
+                        }
+                      }}
+                    >
+                      Remove
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 };
