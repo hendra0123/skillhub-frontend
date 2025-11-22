@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { api } from '../api';
 
@@ -10,10 +10,15 @@ type ClassEntity = {
   status: string;
 };
 
+type SearchField = 'all' | 'name' | 'instructor' | 'status';
+
 const ClassesPage: React.FC = () => {
   const [data, setData] = useState<ClassEntity[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const [search, setSearch] = useState('');
+  const [searchField, setSearchField] = useState<SearchField>('all');
 
   async function load() {
     try {
@@ -32,8 +37,33 @@ const ClassesPage: React.FC = () => {
     load();
   }, []);
 
+  // 🔍 Filter client-side
+  const filteredData = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    if (!term) return data;
+
+    return data.filter((c) => {
+      const fields = {
+        name: c.name?.toLowerCase() ?? '',
+        instructor: c.instructor?.toLowerCase() ?? '',
+        status: c.status?.toLowerCase() ?? '',
+      };
+
+      if (searchField === 'all') {
+        return (
+          fields.name.includes(term) ||
+          fields.instructor.includes(term) ||
+          fields.status.includes(term)
+        );
+      }
+
+      return fields[searchField].includes(term);
+    });
+  }, [data, search, searchField]);
+
   return (
     <div className="space-y-4">
+      {/* Header + tombol tambah */}
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">Classes</h2>
         <Link
@@ -44,12 +74,39 @@ const ClassesPage: React.FC = () => {
         </Link>
       </div>
 
+      {/* 🔍 Search bar + filter dropdown */}
+      <div className="flex flex-wrap gap-3 items-center text-sm">
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-slate-300">Search by</span>
+          <select
+            value={searchField}
+            onChange={(e) => setSearchField(e.target.value as SearchField)}
+            className="border border-slate-600 bg-slate-900 text-xs px-2 py-1 rounded"
+          >
+            <option value="all">All fields</option>
+            <option value="name">Name</option>
+            <option value="instructor">Instructor</option>
+            <option value="status">Status</option>
+          </select>
+        </div>
+
+        <input
+          type="text"
+          placeholder="Ketik kata kunci kelas..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="flex-1 min-w-[200px] border border-slate-600 bg-slate-900 text-xs px-2 py-1.5 rounded"
+        />
+      </div>
+
+      {/* Error */}
       {error && (
         <div className="text-sm text-red-300 bg-red-900/30 border border-red-500 px-3 py-2 rounded">
           {error}
         </div>
       )}
 
+      {/* Tabel */}
       {loading ? (
         <div className="text-sm text-slate-300">Loading...</div>
       ) : (
@@ -64,7 +121,7 @@ const ClassesPage: React.FC = () => {
             </tr>
           </thead>
           <tbody>
-            {data.map((c) => (
+            {filteredData.map((c) => (
               <tr key={c.id} className="border-t border-slate-700">
                 <td className="px-3 py-1.5">{c.id}</td>
                 <td className="px-3 py-1.5">{c.name}</td>
@@ -81,13 +138,13 @@ const ClassesPage: React.FC = () => {
               </tr>
             ))}
 
-            {data.length === 0 && (
+            {filteredData.length === 0 && (
               <tr>
                 <td
                   colSpan={5}
                   className="px-3 py-4 text-center text-slate-400 text-sm"
                 >
-                  Belum ada kelas.
+                  Tidak ada kelas yang cocok dengan filter.
                 </td>
               </tr>
             )}
