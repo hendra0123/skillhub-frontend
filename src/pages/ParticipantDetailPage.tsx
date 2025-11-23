@@ -41,10 +41,10 @@ const ParticipantDetailPage: React.FC = () => {
     if (!id) return;
     setError(null);
     setLoading(true);
+
     try {
       const data: ParticipantDetail = await api.get(`/participants/${id}`);
 
-      // isi form basic participant
       setForm({
         id: data.id,
         nim: data.nim,
@@ -53,7 +53,6 @@ const ParticipantDetailPage: React.FC = () => {
         phone: data.phone,
       });
 
-      // isi enrollments (kalau ada)
       setEnrollments(data.enrollments || []);
     } catch (err: any) {
       setError(err.message || 'Gagal memuat data peserta');
@@ -64,15 +63,15 @@ const ParticipantDetailPage: React.FC = () => {
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (!id || !form) return;
 
-    setError(null);
     setSaving(true);
+    setError(null);
+
     try {
       await api.patch(`/participants/${id}`, {
         nim: form.nim,
@@ -80,7 +79,8 @@ const ParticipantDetailPage: React.FC = () => {
         email: form.email,
         phone: form.phone,
       });
-      await load(); // refresh data setelah update
+
+      await load();
     } catch (err: any) {
       setError(err.message || 'Gagal menyimpan perubahan');
     } finally {
@@ -93,7 +93,6 @@ const ParticipantDetailPage: React.FC = () => {
     const ok = window.confirm('Yakin ingin menghapus peserta ini?');
     if (!ok) return;
 
-    setError(null);
     try {
       await api.delete(`/participants/${id}`);
       navigate('/participants');
@@ -103,146 +102,153 @@ const ParticipantDetailPage: React.FC = () => {
   }
 
   if (loading || !form) {
-    return <div className="text-sm text-slate-300">Loading...</div>;
+    return <div className="page">Loading...</div>;
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">Participant Detail</h2>
-        <button
-          onClick={() => navigate('/participants')}
-          className="text-sm underline"
-        >
-          ← Back to list
+    <div className="page">
+      {/* PAGE HEADER */}
+      <div className="page-header">
+        <div>
+          <h2 className="page-title">Participant Detail</h2>
+          <p className="page-subtitle">Informasi dan riwayat kelas peserta.</p>
+        </div>
+
+        <button className="btn-primary" onClick={() => navigate('/participants')}>
+          ← Back to List
         </button>
       </div>
 
       {error && (
-        <div className="text-sm text-red-300 bg-red-900/30 border border-red-500 px-3 py-2 rounded">
+        <div
+          style={{
+            background: '#7f1d1d',
+            color: '#fecaca',
+            padding: '8px 10px',
+            borderRadius: 6,
+            border: '1px solid #dc2626',
+            fontSize: 13,
+          }}
+        >
           {error}
         </div>
       )}
 
-      {/* FORM UPDATE PARTICIPANT */}
-      <form
-        onSubmit={handleSave}
-        className="space-y-3 bg-slate-800 p-4 rounded border border-slate-700"
-      >
-        <div className="space-y-1 text-sm">
-          <label className="block font-medium">NIM</label>
-          <input
-            className="w-full border rounded px-2 py-1.5 text-sm text-black"
-            value={form.nim}
-            onChange={(e) => setForm({ ...form, nim: e.target.value })}
-          />
-        </div>
+      {/* CARD: FORM UPDATE */}
+      <div className="card">
+        <div className="card-title" style={{ marginBottom: 10 }}>Edit Participant</div>
 
-        <div className="space-y-1 text-sm">
-          <label className="block font-medium">Full Name</label>
-          <input
-            className="w-full border rounded px-2 py-1.5 text-sm text-black"
-            value={form.full_name}
-            onChange={(e) =>
-              setForm({ ...form, full_name: e.target.value })
-            }
-          />
-        </div>
+        <form className="form-grid" onSubmit={handleSave}>
+          {/* NIM */}
+          <div className="form-group">
+            <label className="form-label">NIM</label>
+            <input
+              className="input"
+              value={form.nim}
+              onChange={(e) => setForm({ ...form, nim: e.target.value })}
+            />
+          </div>
 
-        <div className="space-y-1 text-sm">
-          <label className="block font-medium">Email</label>
-          <input
-            className="w-full border rounded px-2 py-1.5 text-sm text-black"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-          />
-        </div>
+          {/* Full Name */}
+          <div className="form-group">
+            <label className="form-label">Full Name</label>
+            <input
+              className="input"
+              value={form.full_name}
+              onChange={(e) => setForm({ ...form, full_name: e.target.value })}
+            />
+          </div>
 
-        <div className="space-y-1 text-sm">
-          <label className="block font-medium">Phone</label>
-          <input
-            className="w-full border rounded px-2 py-1.5 text-sm text-black"
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          />
-        </div>
+          {/* Email */}
+          <div className="form-group">
+            <label className="form-label">Email</label>
+            <input
+              className="input"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+            />
+          </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-3 py-1.5 rounded bg-blue-600 text-white text-sm disabled:opacity-60"
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
+          {/* Phone */}
+          <div className="form-group">
+            <label className="form-label">Phone</label>
+            <input
+              className="input"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+            />
+          </div>
 
-          <button
-            type="button"
-            onClick={handleDelete}
-            className="px-3 py-1.5 rounded border border-red-500 text-red-400 text-sm"
-          >
-            Delete
-          </button>
-        </div>
-      </form>
+          <div className="form-action-row">
+            <button type="submit" className="btn-primary" disabled={saving}>
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
 
-      {/* TABEL KELAS YANG DIIKUTI PESERTA */}
-      <div className="bg-slate-900 p-4 rounded border border-slate-700 space-y-2">
-        <h3 className="text-sm font-semibold">Classes Enrolled</h3>
+            <button
+              type="button"
+              className="btn-danger"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* CARD: ENROLLMENTS */}
+      <div className="card">
+        <div className="card-title">Classes Enrolled</div>
+
         {enrollments.length === 0 ? (
-          <p className="text-xs text-slate-400">
+          <p className="page-subtitle" style={{ fontSize: 12 }}>
             Peserta ini belum terdaftar di kelas mana pun.
           </p>
         ) : (
-          <table className="w-full text-xs border border-slate-700 rounded">
-            <thead className="bg-slate-800">
-              <tr>
-                <th className="px-2 py-1 text-left">Enrollment ID</th>
-                <th className="px-2 py-1 text-left">Class Name</th>
-                <th className="px-2 py-1 text-left">Instructor</th>
-                <th className="px-2 py-1 text-left">Status</th>
-                <th className="px-2 py-1 text-left">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {enrollments.map((en) => (
-                <tr key={en.id} className="border-t border-slate-700">
-                  <td className="px-2 py-1">{en.id}</td>
-                  <td className="px-2 py-1">
-                    {en.classEntity?.name ?? 'Unnamed class'}
-                  </td>
-                  <td className="px-2 py-1">
-                    {en.classEntity?.instructor ?? '-'}
-                  </td>
-                  <td className="px-2 py-1">
-                    {en.classEntity?.status ?? '-'}
-                  </td>
-                  <td className="px-2 py-1">
-                    <button
-                      type="button"
-                      className="text-[11px] text-red-300 underline"
-                      onClick={async () => {
-                        const ok = window.confirm(
-                          'Yakin ingin membatalkan pendaftaran peserta dari kelas ini?',
-                        );
-                        if (!ok) return;
-                        try {
-                          await api.delete(`/enrollments/${en.id}`);
-                          await load(); // refresh data setelah delete
-                        } catch (err: any) {
-                          alert(
-                            err.message || 'Gagal menghapus enrollment',
-                          );
-                        }
-                      }}
-                    >
-                      Remove
-                    </button>
-                  </td>
+          <div className="table-wrapper">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Enrollment ID</th>
+                  <th>Class</th>
+                  <th>Instructor</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {enrollments.map((en) => (
+                  <tr key={en.id}>
+                    <td>{en.id}</td>
+                    <td>{en.classEntity?.name ?? '-'}</td>
+                    <td>{en.classEntity?.instructor ?? '-'}</td>
+                    <td>{en.classEntity?.status ?? '-'}</td>
+
+                    <td>
+                      <button
+                        className="btn-link-danger"
+                        onClick={async () => {
+                          const ok = window.confirm(
+                            'Yakin ingin membatalkan pendaftaran kelas ini?',
+                          );
+                          if (!ok) return;
+
+                          try {
+                            await api.delete(`/enrollments/${en.id}`);
+                            await load();
+                          } catch (err: any) {
+                            alert(err.message || 'Gagal menghapus enrollment');
+                          }
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

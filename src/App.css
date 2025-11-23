@@ -274,3 +274,53 @@
   padding: 16px;
   color: #9ca3af;
 }
+
+/* Form grid */
+.form-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 1fr 1fr;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.form-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: #e5e7eb;
+}
+
+.form-action-row {
+  grid-column: span 2;
+  margin-top: 8px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Buttons */
+.btn-danger {
+  padding: 6px 12px;
+  font-size: 13px;
+  border-radius: 8px;
+  background: transparent;
+  border: 1px solid #dc2626;
+  color: #f87171;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background-color: #7f1d1d;
+}
+
+.btn-link-danger {
+  background: none;
+  border: none;
+  color: #f87171;
+  cursor: pointer;
+  font-size: 12px;
+  text-decoration: underline;
+}
