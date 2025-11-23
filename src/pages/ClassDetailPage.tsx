@@ -37,6 +37,7 @@ const ClassDetailPage: React.FC = () => {
     if (!id) return;
     setError(null);
     setLoading(true);
+
     try {
       const data: ClassDetail = await api.get(`/classes/${id}`);
       setForm(data);
@@ -57,6 +58,7 @@ const ClassDetailPage: React.FC = () => {
 
     setError(null);
     setSaving(true);
+
     try {
       await api.patch(`/classes/${id}`, {
         name: form.name,
@@ -64,6 +66,7 @@ const ClassDetailPage: React.FC = () => {
         instructor: form.instructor,
         status: form.status,
       });
+
       await load();
     } catch (err: any) {
       setError(err.message || 'Gagal menyimpan perubahan');
@@ -87,136 +90,156 @@ const ClassDetailPage: React.FC = () => {
   }
 
   if (loading || !form) {
-    return <div className="text-sm text-slate-300">Loading...</div>;
+    return <div className="page">Loading...</div>;
   }
 
   const enrollments = form.enrollments || [];
 
   return (
-    <div className="space-y-4 max-w-3xl">
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">Class Detail</h2>
+    <div className="page">
+      {/* HEADER */}
+      <div className="page-header">
+        <div>
+          <h2 className="page-title">Class Detail</h2>
+          <p className="page-subtitle">
+            Informasi kelas dan peserta yang terdaftar.
+          </p>
+        </div>
+
         <button
+          type="button"
+          className="btn-primary"
           onClick={() => navigate('/classes')}
-          className="text-sm underline"
         >
-          ← Back to list
+          ← Back to List
         </button>
       </div>
 
+      {/* ERROR */}
       {error && (
-        <div className="text-sm text-red-300 bg-red-900/30 border border-red-500 px-3 py-2 rounded">
+        <div
+          style={{
+            background: '#7f1d1d',
+            color: '#fecaca',
+            padding: '8px 10px',
+            borderRadius: 6,
+            border: '1px solid #dc2626',
+            fontSize: 13,
+          }}
+        >
           {error}
         </div>
       )}
 
-      <form
-        onSubmit={handleSave}
-        className="space-y-3 bg-slate-900 p-4 rounded border border-slate-700"
-      >
-        <div className="space-y-1 text-sm">
-          <label className="block font-medium">Name</label>
-          <input
-            className="w-full border border-slate-600 rounded px-2 py-1.5 text-sm text-black"
-            value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-          />
+      {/* CARD: FORM EDIT KELAS */}
+      <div className="card">
+        <div className="card-title" style={{ marginBottom: 10 }}>
+          Edit Class
         </div>
 
-        <div className="space-y-1 text-sm">
-          <label className="block font-medium">Description</label>
-          <textarea
-            className="w-full border border-slate-600 rounded px-2 py-1.5 text-sm text-black"
-            rows={3}
-            value={form.description}
-            onChange={(e) =>
-              setForm({ ...form, description: e.target.value })
-            }
-          />
-        </div>
+        <form onSubmit={handleSave} className="form-grid">
+          {/* Name */}
+          <div className="form-group">
+            <label className="form-label">Name</label>
+            <input
+              className="input"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              placeholder="Nama kelas"
+            />
+          </div>
 
-        <div className="space-y-1 text-sm">
-          <label className="block font-medium">Instructor</label>
-          <input
-            className="w-full border border-slate-600 rounded px-2 py-1.5 text-sm text-black"
-            value={form.instructor}
-            onChange={(e) =>
-              setForm({ ...form, instructor: e.target.value })
-            }
-          />
-        </div>
+          {/* Instructor */}
+          <div className="form-group">
+            <label className="form-label">Instructor</label>
+            <input
+              className="input"
+              value={form.instructor}
+              onChange={(e) =>
+                setForm({ ...form, instructor: e.target.value })
+              }
+              placeholder="Nama instruktur"
+            />
+          </div>
 
-        <div className="space-y-1 text-sm">
-          <label className="block font-medium">Status</label>
-          <select
-            className="w-full border border-slate-600 rounded px-2 py-1.5 text-sm text-black"
-            value={form.status}
-            onChange={(e) => setForm({ ...form, status: e.target.value })}
-          >
-            <option value="aktif">aktif</option>
-            <option value="nonaktif">nonaktif</option>
-          </select>
-        </div>
+          {/* Description */}
+          <div className="form-group" style={{ gridColumn: 'span 2' }}>
+            <label className="form-label">Description</label>
+            <textarea
+              className="input"
+              rows={3}
+              value={form.description}
+              onChange={(e) =>
+                setForm({ ...form, description: e.target.value })
+              }
+              placeholder="Deskripsi singkat kelas"
+            />
+          </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            type="submit"
-            disabled={saving}
-            className="px-3 py-1.5 rounded bg-blue-600 text-white text-sm disabled:opacity-60"
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
+          {/* Status */}
+          <div className="form-group" style={{ gridColumn: 'span 2' }}>
+            <label className="form-label">Status</label>
+            <select
+              className="select"
+              value={form.status}
+              onChange={(e) => setForm({ ...form, status: e.target.value })}
+            >
+              <option value="aktif">aktif</option>
+              <option value="nonaktif">nonaktif</option>
+            </select>
+          </div>
 
-          <button
-            type="button"
-            onClick={handleDelete}
-            className="px-3 py-1.5 rounded border border-red-500 text-red-400 text-sm"
-          >
-            Delete
-          </button>
-        </div>
-      </form>
+          {/* ACTIONS */}
+          <div className="form-action-row">
+            <button type="submit" className="btn-primary" disabled={saving}>
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
 
-      {/* Peserta di kelas ini */}
-      <div className="bg-slate-900 p-4 rounded border border-slate-700 space-y-2">
-        <h3 className="text-sm font-semibold">Participants in this class</h3>
+            <button
+              type="button"
+              className="btn-danger"
+              onClick={handleDelete}
+            >
+              Delete
+            </button>
+          </div>
+        </form>
+      </div>
+
+      {/* CARD: PARTICIPANTS DI KELAS INI */}
+      <div className="card">
+        <div className="card-title">Participants in this Class</div>
+
         {enrollments.length === 0 ? (
-          <p className="text-xs text-slate-400">
+          <p className="page-subtitle" style={{ fontSize: 12 }}>
             Belum ada peserta di kelas ini.
           </p>
         ) : (
-          <table className="w-full text-xs border border-slate-700 rounded">
-            <thead className="bg-slate-800">
-              <tr>
-                <th className="px-2 py-1 text-left">ID</th>
-                <th className="px-2 py-1 text-left">NIM</th>
-                <th className="px-2 py-1 text-left">Name</th>
-                <th className="px-2 py-1 text-left">Email</th>
-                <th className="px-2 py-1 text-left">Phone</th>
-              </tr>
-            </thead>
-            <tbody>
-              {enrollments.map((en) => (
-                <tr key={en.id} className="border-t border-slate-700">
-                  <td className="px-2 py-1">
-                    {en.participant?.id ?? '-'}
-                  </td>
-                  <td className="px-2 py-1">
-                    {en.participant?.nim ?? '-'}
-                  </td>
-                  <td className="px-2 py-1">
-                    {en.participant?.full_name ?? '-'}
-                  </td>
-                  <td className="px-2 py-1">
-                    {en.participant?.email ?? '-'}
-                  </td>
-                  <td className="px-2 py-1">
-                    {en.participant?.phone ?? '-'}
-                  </td>
+          <div className="table-wrapper">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>Enrollment ID</th>
+                  <th>NIM</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+
+              <tbody>
+                {enrollments.map((en) => (
+                  <tr key={en.id}>
+                    <td>{en.id}</td>
+                    <td>{en.participant?.nim ?? '-'}</td>
+                    <td>{en.participant?.full_name ?? '-'}</td>
+                    <td>{en.participant?.email ?? '-'}</td>
+                    <td>{en.participant?.phone ?? '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         )}
       </div>
     </div>

@@ -24,6 +24,7 @@ const ClassesPage: React.FC = () => {
     try {
       setLoading(true);
       setError(null);
+
       const res = await api.get('/classes');
       setData(res);
     } catch (err: any) {
@@ -37,7 +38,6 @@ const ClassesPage: React.FC = () => {
     load();
   }, []);
 
-  // 🔍 Filter client-side
   const filteredData = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return data;
@@ -62,95 +62,108 @@ const ClassesPage: React.FC = () => {
   }, [data, search, searchField]);
 
   return (
-    <div className="space-y-4">
-      {/* Header + tombol tambah */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-semibold">Classes</h2>
-        <Link
-          to="/classes/new"
-          className="px-3 py-1.5 rounded bg-blue-600 text-white text-sm"
-        >
+    <div className="page">
+      {/* HEADER */}
+      <div className="page-header">
+        <div>
+          <h2 className="page-title">Classes</h2>
+          <p className="page-subtitle">
+            Daftar semua kelas yang tersedia di SkillHub.
+          </p>
+        </div>
+
+        <Link to="/classes/new" className="btn-primary">
           + New Class
         </Link>
       </div>
 
-      {/* 🔍 Search bar + filter dropdown */}
-      <div className="flex flex-wrap gap-3 items-center text-sm">
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-slate-300">Search by</span>
+      {/* ERROR */}
+      {error && (
+        <div
+          style={{
+            background: '#7f1d1d',
+            color: '#fecaca',
+            padding: '8px 10px',
+            borderRadius: 6,
+            border: '1px solid #dc2626',
+            fontSize: 13,
+          }}
+        >
+          {error}
+        </div>
+      )}
+
+      {/* CARD WRAPPER */}
+      <div className="card">
+        {/* FILTERS */}
+        <div className="filters-row" style={{ marginBottom: 12 }}>
+          <label>Search by</label>
+
           <select
+            className="select"
             value={searchField}
             onChange={(e) => setSearchField(e.target.value as SearchField)}
-            className="border border-slate-600 bg-slate-900 text-xs px-2 py-1 rounded"
+            style={{ width: 140 }}
           >
             <option value="all">All fields</option>
             <option value="name">Name</option>
             <option value="instructor">Instructor</option>
             <option value="status">Status</option>
           </select>
+
+          <input
+            type="text"
+            className="input"
+            placeholder="Ketik kata kunci..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            style={{ flex: 1, minWidth: 200 }}
+          />
         </div>
 
-        <input
-          type="text"
-          placeholder="Ketik kata kunci kelas..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="flex-1 min-w-[200px] border border-slate-600 bg-slate-900 text-xs px-2 py-1.5 rounded"
-        />
+        {/* TABLE */}
+        {loading ? (
+          <div style={{ fontSize: 13 }}>Loading...</div>
+        ) : (
+          <div className="table-wrapper">
+            <table className="table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Class Name</th>
+                  <th>Instructor</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+
+              <tbody>
+                {filteredData.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.id}</td>
+                    <td>{c.name}</td>
+                    <td>{c.instructor}</td>
+                    <td>{c.status}</td>
+                    <td>
+                      <Link to={`/classes/${c.id}`} className="btn-link">
+                        Detail
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
+
+                {filteredData.length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="table-empty">
+                      Tidak ada kelas yang cocok dengan filter.
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
-
-      {/* Error */}
-      {error && (
-        <div className="text-sm text-red-300 bg-red-900/30 border border-red-500 px-3 py-2 rounded">
-          {error}
-        </div>
-      )}
-
-      {/* Tabel */}
-      {loading ? (
-        <div className="text-sm text-slate-300">Loading...</div>
-      ) : (
-        <table className="w-full text-sm bg-slate-900 border border-slate-700 rounded">
-          <thead className="bg-slate-800">
-            <tr>
-              <th className="px-3 py-2 text-left">ID</th>
-              <th className="px-3 py-2 text-left">Name</th>
-              <th className="px-3 py-2 text-left">Instructor</th>
-              <th className="px-3 py-2 text-left">Status</th>
-              <th className="px-3 py-2 text-left">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.map((c) => (
-              <tr key={c.id} className="border-t border-slate-700">
-                <td className="px-3 py-1.5">{c.id}</td>
-                <td className="px-3 py-1.5">{c.name}</td>
-                <td className="px-3 py-1.5">{c.instructor}</td>
-                <td className="px-3 py-1.5">{c.status}</td>
-                <td className="px-3 py-1.5">
-                  <Link
-                    to={`/classes/${c.id}`}
-                    className="text-xs text-blue-300 underline"
-                  >
-                    Detail
-                  </Link>
-                </td>
-              </tr>
-            ))}
-
-            {filteredData.length === 0 && (
-              <tr>
-                <td
-                  colSpan={5}
-                  className="px-3 py-4 text-center text-slate-400 text-sm"
-                >
-                  Tidak ada kelas yang cocok dengan filter.
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      )}
     </div>
   );
 };
