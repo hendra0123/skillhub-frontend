@@ -371,3 +371,8 @@
 .select {
   width: 100%;
 }
+
+textarea.input {
+  resize: vertical;
+  min-height: 80px;
+}
