@@ -324,3 +324,50 @@
   font-size: 12px;
   text-decoration: underline;
 }
+
+/* Checkbox grid (2 columns) */
+.checkbox-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 10px;
+}
+
+.checkbox-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: #020617;
+  border: 1px solid #1f2937;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.checkbox-item:hover {
+  background: #111827;
+}
+
+.checkbox-item input[type='checkbox'] {
+  margin-top: 2px;
+}
+
+.checkbox-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.checkbox-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #e5e7eb;
+}
+
+.checkbox-sub {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+/* Select fix */
+.select {
+  width: 100%;
+}

@@ -29,65 +29,101 @@ const NewParticipantPage: React.FC = () => {
   }
 
   return (
-    <div className="max-w-md space-y-4">
-      <h2 className="text-lg font-semibold">New Participant</h2>
+    <div className="page">
+      {/* HEADER */}
+      <div className="page-header">
+        <div>
+          <h2 className="page-title">New Participant</h2>
+          <p className="page-subtitle">
+            Tambahkan peserta baru ke sistem SkillHub.
+          </p>
+        </div>
 
+        <button
+          type="button"
+          className="btn-primary"
+          onClick={() => navigate('/participants')}
+        >
+          ← Back to List
+        </button>
+      </div>
+
+      {/* ERROR */}
       {error && (
-        <div className="text-sm text-red-600 bg-red-50 border border-red-200 px-3 py-2 rounded">
+        <div
+          style={{
+            background: '#7f1d1d',
+            color: '#fecaca',
+            padding: '8px 10px',
+            borderRadius: 6,
+            border: '1px solid #dc2626',
+            fontSize: 13,
+          }}
+        >
           {error}
         </div>
       )}
 
-      <form
-        onSubmit={handleSubmit}
-        className="space-y-3 bg-white p-4 rounded border border-slate-200"
-      >
-        <div className="space-y-1 text-sm">
-          <label className="block font-medium">NIM</label>
-          <input
-            className="w-full border rounded px-2 py-1.5 text-sm"
-            value={form.nim}
-            onChange={(e) => setForm({ ...form, nim: e.target.value })}
-          />
+      {/* FORM CARD */}
+      <div className="card">
+        <div className="card-title" style={{ marginBottom: 10 }}>
+          Participant Information
         </div>
 
-        <div className="space-y-1 text-sm">
-          <label className="block font-medium">Full Name</label>
-          <input
-            className="w-full border rounded px-2 py-1.5 text-sm"
-            value={form.full_name}
-            onChange={(e) =>
-              setForm({ ...form, full_name: e.target.value })
-            }
-          />
-        </div>
+        <form className="form-grid" onSubmit={handleSubmit}>
+          {/* NIM */}
+          <div className="form-group">
+            <label className="form-label">NIM</label>
+            <input
+              className="input"
+              value={form.nim}
+              onChange={(e) => setForm({ ...form, nim: e.target.value })}
+              placeholder="Masukkan NIM"
+            />
+          </div>
 
-        <div className="space-y-1 text-sm">
-          <label className="block font-medium">Email</label>
-          <input
-            className="w-full border rounded px-2 py-1.5 text-sm"
-            value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-          />
-        </div>
+          {/* Full Name */}
+          <div className="form-group">
+            <label className="form-label">Full Name</label>
+            <input
+              className="input"
+              value={form.full_name}
+              onChange={(e) =>
+                setForm({ ...form, full_name: e.target.value })
+              }
+              placeholder="Nama lengkap"
+            />
+          </div>
 
-        <div className="space-y-1 text-sm">
-          <label className="block font-medium">Phone</label>
-          <input
-            className="w-full border rounded px-2 py-1.5 text-sm"
-            value={form.phone}
-            onChange={(e) => setForm({ ...form, phone: e.target.value })}
-          />
-        </div>
+          {/* Email */}
+          <div className="form-group">
+            <label className="form-label">Email</label>
+            <input
+              className="input"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              placeholder="email@example.com"
+            />
+          </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="px-3 py-1.5 rounded bg-slate-900 text-white text-sm disabled:opacity-60"
-        >
-          {loading ? 'Saving...' : 'Save'}
-        </button>
-      </form>
+          {/* Phone */}
+          <div className="form-group">
+            <label className="form-label">Phone</label>
+            <input
+              className="input"
+              value={form.phone}
+              onChange={(e) => setForm({ ...form, phone: e.target.value })}
+              placeholder="08xxxxxxxxxx"
+            />
+          </div>
+
+          <div className="form-action-row">
+            <button type="submit" className="btn-primary" disabled={loading}>
+              {loading ? 'Saving...' : 'Save Participant'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };
